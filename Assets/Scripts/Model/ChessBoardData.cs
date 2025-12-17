@@ -5,9 +5,11 @@ using UnityEngine;
 namespace Model {
     [System.Serializable]
     public class ChessBoardData {
-        public Dictionary<Vector2Int, FigData> BoardState = new ();
+        private Dictionary<Vector2Int, FigData> _boardState = new ();
+        public Dictionary<Vector2Int, FigData> BoardState => _boardState;
 
-        public bool _currentTurnBlack;
+        private bool _currentTurnBlack;
+        public bool CurrentTurnBlack => _currentTurnBlack;
 
         private static readonly FigType[] MainPieces = new[] {
             FigType.Rook, FigType.Knight, FigType.Bishop, FigType.Queen, FigType.King, FigType.Bishop,
@@ -17,14 +19,14 @@ namespace Model {
         public void ResetBoard() {
             _currentTurnBlack = false;
 
-            if (BoardState.Count == 0) {
+            if (_boardState.Count == 0) {
                 for (int len = 0; len < 64; len++) {
-                    BoardState[new Vector2Int(len % 8, len / 8)] = default;
+                    _boardState[new Vector2Int(len % 8, len / 8)] = default;
                 }
             }
             else {
-                foreach (Vector2Int key in BoardState.Keys) {
-                    BoardState[key] = default;
+                foreach (Vector2Int key in _boardState.Keys) {
+                    _boardState[key] = default;
                 }
             }
         }
@@ -43,7 +45,7 @@ namespace Model {
 
         public void PutToBoard(FigType type, bool isBlack, Vector2Int position) {
             FigData piece = new FigData(type, isBlack, position);
-            BoardState[position] = piece;
+            _boardState[position] = piece;
         }
 
         public bool IsValidMove(Vector2Int startPoint, Vector2Int endPoint) {
@@ -66,9 +68,9 @@ namespace Model {
             if(!IsValidMove(startPoint, endPoint))
                 return;
             
-            BoardState[startPoint] = new FigData(FigType.None, false, startPoint);
+            _boardState[startPoint] = new FigData(FigType.None, false, startPoint);
             piece.Coordinates = endPoint;
-            BoardState[endPoint] = piece;
+            _boardState[endPoint] = piece;
             
             //invoke here putting figure to graveyard later
 
@@ -76,7 +78,7 @@ namespace Model {
         }
 
         public FigData GetFigAt(Vector2Int position) {
-            return BoardState.TryGetValue(position, out var piece) ? piece : default;
+            return _boardState.TryGetValue(position, out var piece) ? piece : default;
         }
 
         private bool IsInBounds(Vector2Int position) {
