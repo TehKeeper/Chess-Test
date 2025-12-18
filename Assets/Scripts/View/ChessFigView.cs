@@ -9,7 +9,7 @@ using UnityEngine.UI;
 namespace View {
     [RequireComponent(typeof(Image))]
     public class ChessFigView : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler {
-        [SerializeField] private Canvas _refCanvas;
+      
 
         private FigData _data;
         private RectTransform _rectTransform;
@@ -18,28 +18,15 @@ namespace View {
 
         private Func<bool, bool> _colorMatch;
         private Image _mainImage;
-
-        private static readonly Dictionary<FigType, string> FigSymbols = new Dictionary<FigType, string> {
-            {FigType.King, "♔"},
-            {FigType.Queen, "♕"},
-            {FigType.Rook, "♖"},
-            {FigType.Bishop, "♗"},
-            {FigType.Knight, "♘"},
-            {FigType.Pawn, "♙"}
-        };
-
-        private TMP_Text _textIcon;
+        private Image MainImage => _mainImage ??= GetComponent<Image>();
+        
         private float _scaleFactor;
         private bool _isDragging;
         public Vector2Int BoardCoordinates { get; set; }
 
         private void Awake() {
             _rectTransform = GetComponent<RectTransform>();
-            _textIcon = GetComponentInChildren<TMP_Text>();
             _mainImage = GetComponent<Image>();
-
-            if (_refCanvas)
-                _scaleFactor = _refCanvas.scaleFactor;
         }
 
         public void Initialize(FigData figData, Func<bool, bool> isColorMatch, Sprite sprite, float scaleFactor) {
@@ -47,21 +34,19 @@ namespace View {
 
             _colorMatch = isColorMatch;
             _scaleFactor = scaleFactor;
-            _mainImage.sprite = sprite;
-            _mainImage.color = _data.IsBlack ? Color.black : Color.white;
-
-            _textIcon.text = FigSymbols[figData.Type];
+            MainImage.sprite = sprite;
+            MainImage.color = _data.IsBlack ? Color.black : Color.white;
         }
 
         public void OnBeginDrag(PointerEventData eventData) {
-            /*if (!_colorMatch.Invoke(_data.IsBlack) && _isDragging) 
-                return;*/
+            if (!_colorMatch.Invoke(_data.IsBlack) && _isDragging) 
+                return;
 
             _isDragging = true;
 
             _originalPosition = _rectTransform.anchoredPosition;
 
-            //_mainImage.raycastTarget = false;
+            MainImage.raycastTarget = false;
         }
 
         public void OnDrag(PointerEventData eventData) {
@@ -74,11 +59,10 @@ namespace View {
             if (!_isDragging)
                 return;
 
-            _mainImage.raycastTarget = true;
+            MainImage.raycastTarget = true;
 
             // If not dropped on a valid drop zone, return to original position
-
-            _rectTransform.anchoredPosition = _originalPosition;
+            //_rectTransform.anchoredPosition = _originalPosition;
 
             _isDragging = false;
         }

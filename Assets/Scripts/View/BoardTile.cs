@@ -9,5 +9,13 @@ namespace View {
         public void SetCoordinates(Vector2Int coords) => BoardCoordinates = coords;
 
         public abstract void SetColor(Color tileColor);
+
+        public abstract Transform FigureRoot { get; }
+
+        public Vector3 GetWorldPosition() {
+            return transform.position;
+        }
+
+        public abstract void SetPosition(Vector2Int cachedCoord, float tileSize);
     }
 }
