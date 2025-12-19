@@ -75,6 +75,7 @@ namespace Model {
             //invoke here putting figure to graveyard later
 
             _currentTurnBlack = !_currentTurnBlack;
+            Debug.Log("Current turn: {()}");
         }
 
         public FigData GetFigAt(Vector2Int position) {

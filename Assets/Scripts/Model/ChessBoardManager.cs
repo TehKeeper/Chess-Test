@@ -12,7 +12,7 @@ namespace Model {
         [SerializeField] private Canvas _canvas;
 
         [Header("Prefabs")]
-        [SerializeField] private ChessFigView _figPrefab;
+        [SerializeField] private ChessFigureBase _figPrefab;
 
         [Header("Sprites")]
         [SerializeField] private Pair<FigType, Sprite>[] _figSprites;
@@ -24,7 +24,7 @@ namespace Model {
         public bool CurrentTurnBlack => _boardData.CurrentTurnBlack;
 
         [SerializeField] private BoardSpawnerBase _boardSpawner;
-        private List<ChessFigView> _onBoardFigures = new();
+        private List<ChessFigureBase> _onBoardFigures = new();
 
 
         private void Awake() {
@@ -35,7 +35,7 @@ namespace Model {
             _boardSpawner.SpawnTiles(OnReleaseHandler);
         }
 
-        private void OnReleaseHandler(Vector2Int coordinates, BoardTile tile, ChessFigView figure) {
+        private void OnReleaseHandler(Vector2Int coordinates, BoardTile tile, ChessFigureBase figure) {
             if(figure==null)
                 return;
 
@@ -48,7 +48,6 @@ namespace Model {
                 }
                 else {
                     figure.ResetPosition();
-                   
                 }
             }
         }
@@ -66,7 +65,7 @@ namespace Model {
 
             _onBoardFigures.Clear();
 
-            ChessFigView cachedFig = null;
+            ChessFigureBase cachedFig = null;
             Transform canvasTransform = _canvas.transform;
             foreach (var kvp in _boardData.BoardState) {
                 if (kvp.Value.Type == FigType.None)
@@ -79,6 +78,10 @@ namespace Model {
                     _canvas.scaleFactor, kvp.Key);
 
                 _onBoardFigures.Add(cachedFig);
+            }
+
+            foreach (ChessFigureBase boardFig in _onBoardFigures) {
+                boardFig.MakeActive(_boardData.CurrentTurnBlack == boardFig.FigColor);
             }
         }
 

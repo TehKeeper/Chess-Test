@@ -1,14 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using Model.Data;
-using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace View {
     [RequireComponent(typeof(Image))]
-    public class ChessFigView : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler {
+    public class ChessFigView : ChessFigureBase, IBeginDragHandler, IDragHandler, IEndDragHandler {
       
 
         private FigData _data;
@@ -22,14 +20,19 @@ namespace View {
         
         private float _scaleFactor;
         private bool _isDragging;
-        public Vector2Int BoardCoordinates { get; private set; }
+        
+        public override bool FigColor => _data.IsBlack;
 
         private void Awake() {
             _rectTransform = GetComponent<RectTransform>();
             _mainImage = GetComponent<Image>();
         }
 
-        public void Initialize(FigData figData, Func<bool, bool> isColorMatch, Sprite sprite, float scaleFactor,
+        public override void MakeActive(bool b) {
+            _mainImage.raycastTarget = b;
+        }
+
+        public override void Initialize(FigData figData, Func<bool, bool> isColorMatch, Sprite sprite, float scaleFactor,
             Vector2Int coordinates) {
             _data = figData;
 
@@ -70,8 +73,10 @@ namespace View {
             _isDragging = false;
         }
 
-        public void ResetPosition() {
+        public override void ResetPosition() {
             _rectTransform.anchoredPosition = _originalPosition;
         }
+
+       
     }
 }
