@@ -75,6 +75,8 @@ namespace Model {
             piece.Coordinates = endPoint;
             _boardState[endPoint] = piece;
 
+            _boardState[endPoint] = new FigData(piece, startPoint);
+
             //invoke here putting figure to graveyard later
 
             CurrentTurnBlack = !CurrentTurnBlack;
