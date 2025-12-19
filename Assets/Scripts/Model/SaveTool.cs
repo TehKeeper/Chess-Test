@@ -4,20 +4,34 @@ using UnityEngine;
 
 namespace Model {
     public class SaveTool {
-        public string WrapState(Dictionary<Vector2Int, FigData> boardState, bool isBlackTurn) {
+        private const string SAVE_KEY = "Chessboard_Quicksave";
+        public void SaveBoard(ChessBoardData boardData) {
+            PlayerPrefs.SetString(SAVE_KEY, WrapState(boardData.BoardState, boardData.CurrentTurnBlack));
+        }
+        
+        
+        private string WrapState(Dictionary<Vector2Int, FigData> boardState, bool isBlackTurn) {
             ChessBoardDataWrapper wrapper = new ChessBoardDataWrapper(isBlackTurn, boardState);
 
 
             return JsonUtility.ToJson(wrapper);
         }
 
-        public Dictionary<Vector2Int, FigData> UnwrapState(string json, out bool currentTurnIsBlack) {
+        public void LoadBoard(ChessBoardData boardData) {
+            if(!PlayerPrefs.HasKey(SAVE_KEY))
+                return;
+            
+            UnwrapState(PlayerPrefs.GetString(SAVE_KEY), out bool turnIsBlack, out Dictionary<Vector2Int, FigData> loadedData);
+            boardData.SetBoardData(loadedData, turnIsBlack);
+
+        }
+        
+        private void UnwrapState(string json, out bool currentTurnIsBlack, out  Dictionary<Vector2Int, FigData> loadedData) {
             if (string.IsNullOrEmpty(json)) {
                 Debug.LogError("Saved data is empty! Restore default chess board");
             }
             
-            
-            Dictionary<Vector2Int, FigData> loadedData = new();
+           loadedData = new();
 
             ChessBoardDataWrapper wrapper = JsonUtility.FromJson<ChessBoardDataWrapper>(json);
             currentTurnIsBlack = wrapper.CurrentTurn;
@@ -28,8 +42,8 @@ namespace Model {
 
                 loadedData[cachedData.Coordinates] = cachedData;
             }
-
-            return loadedData;
         }
+        
+        
     }
 }

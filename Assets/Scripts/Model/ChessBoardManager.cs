@@ -33,6 +33,8 @@ namespace Model {
 
         private List<IDisposable> _disposers = new List<IDisposable>();
 
+        private SaveTool _saveTool = new SaveTool();
+
 
         private void Awake() {
             foreach (var item in _figSprites) {
@@ -41,9 +43,14 @@ namespace Model {
 
             _boardSpawner.SpawnTiles(OnReleaseHandler);
             
-            _display.SetupHandlers(delegate { ResetGame(); }, delegate {  }  , delegate {  } );
+            _display.SetupHandlers(ResetGame, delegate { _saveTool.SaveBoard(_boardData); }  ,
+                delegate {
+                    _saveTool.LoadBoard(_boardData);
+                    UpdateBoard();
+                } );
 
             _boardData.OnTurnChange += _display.UpdateTurn;
+            _disposers.AddDisposer(delegate {   _boardData.OnTurnChange -= _display.UpdateTurn; });
 
         }
 

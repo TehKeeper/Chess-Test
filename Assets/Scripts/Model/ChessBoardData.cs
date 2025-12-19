@@ -6,10 +6,11 @@ using UnityEngine;
 namespace Model {
     [System.Serializable]
     public class ChessBoardData {
-        private Dictionary<Vector2Int, FigData> _boardState = new ();
+        private Dictionary<Vector2Int, FigData> _boardState = new();
         public Dictionary<Vector2Int, FigData> BoardState => _boardState;
 
         private bool _currentTurnBlack;
+
         public bool CurrentTurnBlack {
             get { return _currentTurnBlack; }
             set {
@@ -27,16 +28,9 @@ namespace Model {
 
         public void ResetBoard() {
             CurrentTurnBlack = false;
-
-            if (_boardState.Count == 0) {
-                for (int len = 0; len < 64; len++) {
-                    _boardState[new Vector2Int(len % 8, len / 8)] = default;
-                }
-            }
-            else {
-                foreach (Vector2Int key in _boardState.Keys) {
-                    _boardState[key] = default;
-                }
+            
+            for (int len = 0; len < 64; len++) {
+                _boardState[new Vector2Int(len % 8, len / 8)] = default;
             }
         }
 
@@ -46,7 +40,7 @@ namespace Model {
             for (int i = 0; i < 8; i++) {
                 PutToBoard(MainPieces[i], false, new Vector2Int(i, 0));
                 PutToBoard(FigType.Pawn, false, new Vector2Int(i, 1));
-                
+
                 PutToBoard(MainPieces[i], true, new Vector2Int(i, 7));
                 PutToBoard(FigType.Pawn, true, new Vector2Int(i, 6));
             }
@@ -73,14 +67,14 @@ namespace Model {
         public void MovePiece(Vector2Int startPoint, Vector2Int endPoint) {
             FigData piece = GetFigAt(startPoint);
             if (piece.Type == FigType.None) return;
-            
-            if(!IsValidMove(startPoint, endPoint))
+
+            if (!IsValidMove(startPoint, endPoint))
                 return;
-            
+
             _boardState[startPoint] = new FigData(FigType.None, false, startPoint);
             piece.Coordinates = endPoint;
             _boardState[endPoint] = piece;
-            
+
             //invoke here putting figure to graveyard later
 
             CurrentTurnBlack = !CurrentTurnBlack;
@@ -94,6 +88,10 @@ namespace Model {
             return position.x is >= 0 and < 8 && position.y is >= 0 and < 8;
         }
 
-        
+
+        public void SetBoardData(Dictionary<Vector2Int, FigData> loadedData, bool currentTurnIsBlack) {
+            _boardState = loadedData;
+            CurrentTurnBlack = currentTurnIsBlack;
+        }
     }
 }

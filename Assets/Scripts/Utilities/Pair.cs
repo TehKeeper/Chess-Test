@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Utilities {
     [System.Serializable]
@@ -11,19 +12,16 @@ namespace Utilities {
             B = b;
         }
     }
-
-    public class Disposer : IDisposable {
-        private Action _handler;
-
-        public Disposer(Action handler) {
-            _handler = handler;
+    
+    public static class DisposerExt {
+        public static void AddDisposer(this List<IDisposable> disposables, Action handler) {
+            disposables.Add(new Disposer(handler));
         }
-
-
-        public void Dispose() {
-            Action handler = _handler;
-            _handler = null;
-            handler?.Invoke();
+        
+        public static void DisposeAll(this List<IDisposable> disposables) {
+            foreach (IDisposable disposer in disposables) {
+                disposer.Dispose();
+            }
         }
     }
 }

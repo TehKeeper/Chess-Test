@@ -11,7 +11,7 @@ namespace View.UI {
         [SerializeField] private Button _quickLoadButton;
 
         public void UpdateTurn(bool isBlack) {
-            _currentTurnText.text = $"Ходят {(isBlack ? "<color#=000000>чёрные</color>" : "<color#=ffffff>белые</color>")}";
+            _currentTurnText.text = $"Ходят <b><color=#{(isBlack ? "000000>чёрные" : "ffffff>белые")}</color></b>";
         }
 
         public void SetupHandlers(UnityAction reset, UnityAction quickSave, UnityAction quickLoad) {
