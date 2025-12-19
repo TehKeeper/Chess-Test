@@ -1,11 +1,10 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace View {
     [RequireComponent(typeof(Image))]
-    public class BoardTile2D : BoardTile, IEndDragHandler {
+    public class BoardTile2D : BoardTile, IDropHandler {
         private Transform _cachedTransform;
         public override Transform FigureRoot => _cachedTransform ??= transform;
 
@@ -14,8 +13,13 @@ namespace View {
             rtf.anchoredPosition = new Vector2((cachedCoord.x + 0.5f) * tileSize, (cachedCoord.y + 0.5f) * tileSize);
             rtf.sizeDelta = Vector2.one * tileSize;
         }
+        
 
-        public void OnEndDrag(PointerEventData eventData) {
+        public void OnDrop(PointerEventData eventData) {
+            EndDragRelease(eventData);
+        }
+
+        private void EndDragRelease(PointerEventData eventData) {
             if (!eventData.pointerDrag)
                 return;
 
@@ -24,18 +28,11 @@ namespace View {
                 return;
             }
 
+            eventData.pointerDrag.TryGetComponent(out ChessFigView chessFig);
 
-            /*ChessFigView chessFig;
-            if (!eventData.pointerDrag.TryGetComponent(out chessFig)) {
-                return;
-            }*/
+            raycastedObject.TryGetComponent(out BoardTile tile);
 
-            BoardTile tile;
-            if (!raycastedObject.TryGetComponent(out tile)) {
-                return;
-            }
-
-            Debug.Log($"End Drag Tile: {tile.BoardCoordinates}");
+            ReleaseFigure(tile, chessFig);
         }
 
         public override void SetColor(Color tileColor) {

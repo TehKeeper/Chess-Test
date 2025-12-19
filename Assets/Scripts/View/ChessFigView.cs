@@ -22,20 +22,26 @@ namespace View {
         
         private float _scaleFactor;
         private bool _isDragging;
-        public Vector2Int BoardCoordinates { get; set; }
+        public Vector2Int BoardCoordinates { get; private set; }
 
         private void Awake() {
             _rectTransform = GetComponent<RectTransform>();
             _mainImage = GetComponent<Image>();
         }
 
-        public void Initialize(FigData figData, Func<bool, bool> isColorMatch, Sprite sprite, float scaleFactor) {
+        public void Initialize(FigData figData, Func<bool, bool> isColorMatch, Sprite sprite, float scaleFactor,
+            Vector2Int coordinates) {
             _data = figData;
 
             _colorMatch = isColorMatch;
             _scaleFactor = scaleFactor;
             MainImage.sprite = sprite;
             MainImage.color = _data.IsBlack ? Color.black : Color.white;
+            SetCoordinates(coordinates);
+        }
+
+        public void SetCoordinates(Vector2Int coordinates) {
+            BoardCoordinates = coordinates;
         }
 
         public void OnBeginDrag(PointerEventData eventData) {
@@ -61,10 +67,11 @@ namespace View {
 
             MainImage.raycastTarget = true;
 
-            // If not dropped on a valid drop zone, return to original position
-            //_rectTransform.anchoredPosition = _originalPosition;
-
             _isDragging = false;
+        }
+
+        public void ResetPosition() {
+            _rectTransform.anchoredPosition = _originalPosition;
         }
     }
 }

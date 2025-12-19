@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace View {
     public class BoardSpawner2D : BoardSpawnerBase {
@@ -13,7 +14,7 @@ namespace View {
         }
 
         [ContextMenu("Spawn Tiles")]
-        public override void SpawnTiles() {
+        public override void SpawnTiles(Action<Vector2Int, BoardTile, ChessFigView> onReleaseHandler) {
             BoardTile cachedTile;
             Vector2Int cachedCoord;
             for (int i = 0; i < 64; i++) {
@@ -23,7 +24,7 @@ namespace View {
                 cachedTile.SetCoordinates(new Vector2Int(i % 8, i / 8));
 
                 cachedTile.SetPosition(cachedCoord, _tileSize);
-                
+                cachedTile.SubscribeHandler(onReleaseHandler);
                 
                 
                 cachedTile.SetColor((i / 8 ^ i) % 2 == 0 ? BrightColor : DarkColor);

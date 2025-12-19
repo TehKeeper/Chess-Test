@@ -19,9 +19,9 @@ namespace Model {
 
         private Dictionary<FigType, Sprite> _figuresSpriteDictionary = new();
 
-        private ChessBoardData boardData = new ChessBoardData();
+        private ChessBoardData _boardData = new ChessBoardData();
 
-        public bool CurrentTurnBlack => boardData.CurrentTurnBlack;
+        public bool CurrentTurnBlack => _boardData.CurrentTurnBlack;
 
         [SerializeField] private BoardSpawnerBase _boardSpawner;
         private List<ChessFigView> _onBoardFigures = new();
@@ -32,17 +32,34 @@ namespace Model {
                 _figuresSpriteDictionary.Add(item.A, item.B);
             }
 
-            _boardSpawner.SpawnTiles();
+            _boardSpawner.SpawnTiles(OnReleaseHandler);
+        }
+
+        private void OnReleaseHandler(Vector2Int coordinates, BoardTile tile, ChessFigView figure) {
+            if(figure==null)
+                return;
+
+            if (figure != null && tile != null) {
+                Vector2Int from = figure.BoardCoordinates;
+                Vector2Int to = tile.BoardCoordinates;
+                if (_boardData.IsValidMove(from, to)) {
+                    _boardData.MovePiece(from, to);
+                    UpdateBoard();
+                }
+                else {
+                    figure.ResetPosition();
+                   
+                }
+            }
         }
 
         private void Start() {
-            
-
-            boardData.SetupStandardGame();
+            _boardData.SetupStandardGame();
             UpdateBoard();
         }
 
         private void UpdateBoard() {
+            //todo very crude update. need to eliminate "eaten" figure while not touching the others
             foreach (var piece in _onBoardFigures) {
                 Destroy(piece.gameObject); //todo pool?
             }
@@ -51,7 +68,7 @@ namespace Model {
 
             ChessFigView cachedFig = null;
             Transform canvasTransform = _canvas.transform;
-            foreach (var kvp in boardData.BoardState) {
+            foreach (var kvp in _boardData.BoardState) {
                 if (kvp.Value.Type == FigType.None)
                     continue;
 
@@ -59,36 +76,23 @@ namespace Model {
                 cachedFig = Instantiate(_figPrefab, _boardSpawner.Tiles[kvp.Key].GetWorldPosition(),
                     Quaternion.identity,canvasTransform);
                 cachedFig.Initialize(kvp.Value, MatchColorToCurrentTurn, _figuresSpriteDictionary[kvp.Value.Type],
-                    _canvas.scaleFactor);
+                    _canvas.scaleFactor, kvp.Key);
 
                 _onBoardFigures.Add(cachedFig);
             }
         }
 
-        private bool MatchColorToCurrentTurn(bool arg) => arg == boardData.CurrentTurnBlack;
+        private bool MatchColorToCurrentTurn(bool arg) => arg == _boardData.CurrentTurnBlack;
 
         public void OnDrop(PointerEventData eventData) {
-            var piece = eventData.pointerDrag?.GetComponent<ChessFigView>();
-            var tile = eventData.pointerCurrentRaycast.gameObject?.GetComponent<BoardTile>();
-            if (piece != null && tile != null) {
-                Vector2Int from = piece.BoardCoordinates;
-                Vector2Int to = tile.BoardCoordinates;
-                if (boardData.IsValidMove(from, to)) {
-                    boardData.MovePiece(from, to);
-                    UpdateBoard();
-                }
-                else {
-                    //piece.UpdatePosition(piece.originalPosition);
-                    //piece.transform.SetParent(piece.originalParent); todo
-                }
-            }
+            
         }
 
 
         [ContextMenu("Reset Game")]
         private void ResetGame() {
-            boardData.ResetBoard();
-            boardData.SetupStandardGame();
+            _boardData.ResetBoard();
+            _boardData.SetupStandardGame();
             UpdateBoard();
         }
     }

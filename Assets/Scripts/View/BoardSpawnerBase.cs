@@ -9,6 +9,6 @@ namespace View {
         [SerializeField] protected Color DarkColor = new Color(0.4528302f, 0.2387267f, 0.1772873f);
         public Dictionary<Vector2Int, BoardTile> Tiles = new ();
         protected abstract Transform Root { get; }
-        public abstract void SpawnTiles();
+        public abstract void SpawnTiles(Action<Vector2Int, BoardTile, ChessFigView> onReleaseHandler);
     }
 }
