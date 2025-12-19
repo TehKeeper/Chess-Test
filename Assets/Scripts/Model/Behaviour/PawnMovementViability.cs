@@ -5,14 +5,14 @@ using UnityEngine;
 namespace Model.Behaviour {
     public class PawnMovementViability : ChessMovementViabilityBase {
         protected override FigType Type => FigType.Pawn;
-        
+
         protected override bool MoveLogic(FigData figureData, Vector2Int startCoords, Vector2Int endCoords,
-            Dictionary<Vector2Int, FigData> boardState) {
-
-
+            Dictionary<Vector2Int, FigData> boardState, out Vector2Int consumedFigureCoord) {
             int deltaX = endCoords.x - startCoords.x;
             int deltaY = endCoords.y - startCoords.y;
-
+            consumedFigureCoord = NonExistCoord;
+            
+            
             int deltaMp = figureData.IsBlack ? -1 : 1;
             int gameStartY = figureData.IsBlack ? 6 : 1;
             if (deltaX == 0) {
@@ -23,17 +23,20 @@ namespace Model.Behaviour {
 
             if (deltaX == 1 || deltaX == -1 && deltaY == deltaMp) {
                 //capture
-                if (boardState[endCoords].IsBlack != figureData.IsBlack) {
+                if (boardState[endCoords].Type!=FigType.None && boardState[endCoords].IsBlack != figureData.IsBlack) {
+                    consumedFigureCoord = endCoords;
                     return true;
                 }
 
                 //En Passant
+                
                 Vector2Int enPassantTarget = new Vector2Int(endCoords.x, startCoords.y);
-                if (boardState.TryGetValue(enPassantTarget, out FigData targetPawn) &&
-                    targetPawn.Type == FigType.Pawn &&
-                    targetPawn.IsBlack != figureData.IsBlack &&
-                    enPassantTarget.y - targetPawn.PreviousCoordinates.y == 2 * deltaMp) {
-                    return true;
+                FigData targetPawn = boardState[enPassantTarget];
+                if (targetPawn.Type == FigType.Pawn && targetPawn.IsBlack != figureData.IsBlack) {
+                    bool targetEaten = targetPawn.PreviousCoordinates.y - enPassantTarget.y == 2 * deltaMp;
+                    if (targetEaten)
+                        consumedFigureCoord = enPassantTarget;
+                    return targetEaten;
                 }
             }
 

@@ -9,15 +9,18 @@ namespace Model.Behaviour {
         private ChessMovementViabilityBase _nextNode;
         private bool _hasNextNode;
 
+        public static readonly Vector2Int NonExistCoord = new Vector2Int(-1, -1);
+
         public bool IsViableMove(FigData figureData, Vector2Int startCoords, Vector2Int endCoords,
-            Dictionary<Vector2Int, FigData> boardState) {
+            Dictionary<Vector2Int, FigData> boardState, out Vector2Int consumedFigureCoord) {
             if (figureData.Type == Type)
-                return MoveLogic(figureData, startCoords, endCoords, boardState);
+                return MoveLogic(figureData, startCoords, endCoords, boardState, out consumedFigureCoord);
 
             if (_hasNextNode) {
-                return _nextNode.IsViableMove(figureData, startCoords, endCoords, boardState);
+                return _nextNode.IsViableMove(figureData, startCoords, endCoords, boardState, out consumedFigureCoord);
             }
 
+            consumedFigureCoord = NonExistCoord;
             return false;
         }
 
@@ -29,6 +32,6 @@ namespace Model.Behaviour {
 
 
         protected abstract bool MoveLogic(FigData figureData, Vector2Int startCoords, Vector2Int endCoords,
-            Dictionary<Vector2Int, FigData> boardState);
+            Dictionary<Vector2Int, FigData> boardState, out Vector2Int consumedFigureCoord);
     }
 }

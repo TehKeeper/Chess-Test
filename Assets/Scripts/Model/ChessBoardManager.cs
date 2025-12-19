@@ -61,8 +61,7 @@ namespace Model {
             if (tile != null) {
                 Vector2Int from = figure.BoardCoordinates;
                 Vector2Int to = tile.BoardCoordinates;
-                if (_boardData.IsValidMove(from, to)) {
-                    _boardData.MovePiece(from, to);
+                if (_boardData.TryMovePiece(from, to)) {
                     UpdateBoard();
                 }
                 else {

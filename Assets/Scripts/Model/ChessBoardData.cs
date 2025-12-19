@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Model.Behaviour;
 using Model.Data;
 using UnityEngine;
 
@@ -26,6 +27,13 @@ namespace Model {
             FigType.Knight, FigType.Rook,
         };
 
+        private ChessMovementViabilityBase _movementLogic;
+
+        public ChessBoardData() {
+            _movementLogic = new PawnMovementViability()
+                .ThenUse(new RookMovementViability());
+        }
+
         public void ResetBoard() {
             CurrentTurnBlack = false;
             
@@ -51,7 +59,8 @@ namespace Model {
             _boardState[position] = piece;
         }
 
-        public bool IsValidMove(Vector2Int startPoint, Vector2Int endPoint) {
+        public bool IsValidMove(Vector2Int startPoint, Vector2Int endPoint, out Vector2Int eatenFigure) {
+            eatenFigure = ChessMovementViabilityBase.NonExistCoord;
             if (!IsInBounds(startPoint) || !IsInBounds(endPoint)) return false;
             if (startPoint == endPoint) return false;
 
@@ -61,25 +70,27 @@ namespace Model {
             FigData target = GetFigAt(endPoint);
             if (target.Type != FigType.None && target.IsBlack == piece.IsBlack) return false;
 
-            return true;
+            return _movementLogic.IsViableMove(piece, startPoint, endPoint, _boardState, out eatenFigure);
         }
 
-        public void MovePiece(Vector2Int startPoint, Vector2Int endPoint) {
+        public bool TryMovePiece(Vector2Int startPoint, Vector2Int endPoint) {
             FigData piece = GetFigAt(startPoint);
-            if (piece.Type == FigType.None) return;
+            if (piece.Type == FigType.None) return false;
 
-            if (!IsValidMove(startPoint, endPoint))
-                return;
+            if (!IsValidMove(startPoint, endPoint, out Vector2Int eatenFigure))
+                return false;
 
             _boardState[startPoint] = new FigData(FigType.None, false, startPoint);
             piece.Coordinates = endPoint;
-            _boardState[endPoint] = piece;
-
+            if (eatenFigure.x >= 0)
+                _boardState[eatenFigure] = default;
+            
             _boardState[endPoint] = new FigData(piece, startPoint);
 
             //invoke here putting figure to graveyard later
 
             CurrentTurnBlack = !CurrentTurnBlack;
+            return true;
         }
 
         public FigData GetFigAt(Vector2Int position) {
