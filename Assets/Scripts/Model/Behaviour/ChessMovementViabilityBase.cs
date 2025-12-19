@@ -12,15 +12,15 @@ namespace Model.Behaviour {
         public static readonly Vector2Int NonExistCoord = new Vector2Int(-1, -1);
 
         public bool IsViableMove(FigData figureData, Vector2Int startCoords, Vector2Int endCoords,
-            Dictionary<Vector2Int, FigData> boardState, out Vector2Int consumedFigureCoord) {
+            Dictionary<Vector2Int, FigData> boardState, out (Vector2Int coord, FigAbilityType ability) abilityTrigger) {
             if (figureData.Type == Type)
-                return MoveLogic(figureData, startCoords, endCoords, boardState, out consumedFigureCoord);
+                return MoveLogic(figureData, startCoords, endCoords, boardState, out abilityTrigger);
 
             if (_hasNextNode) {
-                return _nextNode.IsViableMove(figureData, startCoords, endCoords, boardState, out consumedFigureCoord);
+                return _nextNode.IsViableMove(figureData, startCoords, endCoords, boardState, out abilityTrigger);
             }
 
-            consumedFigureCoord = NonExistCoord;
+            abilityTrigger = (NonExistCoord, FigAbilityType.None);
             return false;
         }
 
@@ -32,6 +32,11 @@ namespace Model.Behaviour {
 
 
         protected abstract bool MoveLogic(FigData figureData, Vector2Int startCoords, Vector2Int endCoords,
-            Dictionary<Vector2Int, FigData> boardState, out Vector2Int consumedFigureCoord);
+            Dictionary<Vector2Int, FigData> boardState, out (Vector2Int coord, FigAbilityType ability) abilityTrigger);
+    }
+    
+    public enum FigAbilityType{
+        None,
+        EnPassant
     }
 }

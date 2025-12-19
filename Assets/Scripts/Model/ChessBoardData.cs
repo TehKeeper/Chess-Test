@@ -59,8 +59,8 @@ namespace Model {
             _boardState[position] = piece;
         }
 
-        public bool IsValidMove(Vector2Int startPoint, Vector2Int endPoint, out Vector2Int eatenFigure) {
-            eatenFigure = ChessMovementViabilityBase.NonExistCoord;
+        public bool IsValidMove(Vector2Int startPoint, Vector2Int endPoint, out (Vector2Int coord, FigAbilityType ability) abilityTrigger) {
+            abilityTrigger = (ChessMovementViabilityBase.NonExistCoord, FigAbilityType.None);
             if (!IsInBounds(startPoint) || !IsInBounds(endPoint)) return false;
             if (startPoint == endPoint) return false;
 
@@ -70,20 +70,19 @@ namespace Model {
             FigData target = GetFigAt(endPoint);
             if (target.Type != FigType.None && target.IsBlack == piece.IsBlack) return false;
 
-            return _movementLogic.IsViableMove(piece, startPoint, endPoint, _boardState, out eatenFigure);
+            return _movementLogic.IsViableMove(piece, startPoint, endPoint, _boardState, out abilityTrigger);
         }
 
         public bool TryMovePiece(Vector2Int startPoint, Vector2Int endPoint) {
             FigData piece = GetFigAt(startPoint);
             if (piece.Type == FigType.None) return false;
 
-            if (!IsValidMove(startPoint, endPoint, out Vector2Int eatenFigure))
+            if (!IsValidMove(startPoint, endPoint, out (Vector2Int coord, FigAbilityType ability) abilityTrigger))
                 return false;
 
             _boardState[startPoint] = new FigData(FigType.None, false, startPoint);
             piece.Coordinates = endPoint;
-            if (eatenFigure.x >= 0)
-                _boardState[eatenFigure] = default;
+            AbilityActivation(abilityTrigger);
             
             _boardState[endPoint] = new FigData(piece, startPoint);
 
@@ -91,6 +90,16 @@ namespace Model {
 
             CurrentTurnBlack = !CurrentTurnBlack;
             return true;
+        }
+
+        private void AbilityActivation((Vector2Int coord, FigAbilityType ability) abilityTrigger) {
+            switch (abilityTrigger.ability) {
+                case FigAbilityType.None:
+                    return;
+                case FigAbilityType.EnPassant:
+                    _boardState[abilityTrigger.coord] = default;
+                    break;
+            }
         }
 
         public FigData GetFigAt(Vector2Int position) {

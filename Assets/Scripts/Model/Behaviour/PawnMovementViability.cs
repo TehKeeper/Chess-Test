@@ -7,10 +7,10 @@ namespace Model.Behaviour {
         protected override FigType Type => FigType.Pawn;
 
         protected override bool MoveLogic(FigData figureData, Vector2Int startCoords, Vector2Int endCoords,
-            Dictionary<Vector2Int, FigData> boardState, out Vector2Int consumedFigureCoord) {
+            Dictionary<Vector2Int, FigData> boardState, out (Vector2Int coord, FigAbilityType ability) abilityTrigger) {
             int deltaX = endCoords.x - startCoords.x;
             int deltaY = endCoords.y - startCoords.y;
-            consumedFigureCoord = NonExistCoord;
+            abilityTrigger = (NonExistCoord, FigAbilityType.None);
             
             
             int deltaMp = figureData.IsBlack ? -1 : 1;
@@ -24,7 +24,7 @@ namespace Model.Behaviour {
             if (deltaX == 1 || deltaX == -1 && deltaY == deltaMp) {
                 //capture
                 if (boardState[endCoords].Type!=FigType.None && boardState[endCoords].IsBlack != figureData.IsBlack) {
-                    consumedFigureCoord = endCoords;
+                    
                     return true;
                 }
 
@@ -35,7 +35,7 @@ namespace Model.Behaviour {
                 if (targetPawn.Type == FigType.Pawn && targetPawn.IsBlack != figureData.IsBlack) {
                     bool targetEaten = targetPawn.PreviousCoordinates.y - enPassantTarget.y == 2 * deltaMp;
                     if (targetEaten)
-                        consumedFigureCoord = enPassantTarget;
+                        abilityTrigger = (enPassantTarget, FigAbilityType.EnPassant);
                     return targetEaten;
                 }
             }
