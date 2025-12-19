@@ -10,10 +10,10 @@ namespace View {
 
         public override void SetPosition(Vector2Int cachedCoord, float tileSize) {
             RectTransform rtf = GetComponent<RectTransform>();
-            rtf.anchoredPosition = new Vector2((cachedCoord.x + 0.5f) * tileSize, (cachedCoord.y + 0.5f) * tileSize);
+            rtf.anchoredPosition = new Vector2((cachedCoord.x - 3.5f) * tileSize, (cachedCoord.y - 3.5f) * tileSize);
             rtf.sizeDelta = Vector2.one * tileSize;
         }
-        
+
 
         public void OnDrop(PointerEventData eventData) {
             EndDragRelease(eventData);
