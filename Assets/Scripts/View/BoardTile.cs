@@ -22,7 +22,6 @@ namespace View {
         public abstract void SetPosition(Vector2Int cachedCoord, float tileSize);
 
         protected void ReleaseFigure(BoardTile tile, ChessFigView figure) {
-            Debug.Log($"Release figure, tile: {tile.BoardCoordinates}, figure: {figure.BoardCoordinates}");
             OnFigureRelease?.Invoke(BoardCoordinates, tile, figure);
         }
 

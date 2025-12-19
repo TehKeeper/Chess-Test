@@ -7,8 +7,6 @@ using UnityEngine.UI;
 namespace View {
     [RequireComponent(typeof(Image))]
     public class ChessFigView : ChessFigureBase, IBeginDragHandler, IDragHandler, IEndDragHandler {
-      
-
         private FigData _data;
         private RectTransform _rectTransform;
         private Vector2 _originalPosition;
@@ -17,10 +15,10 @@ namespace View {
         private Func<bool, bool> _colorMatch;
         private Image _mainImage;
         private Image MainImage => _mainImage ??= GetComponent<Image>();
-        
+
         private float _scaleFactor;
         private bool _isDragging;
-        
+
         public override bool FigColor => _data.IsBlack;
 
         private void Awake() {
@@ -32,7 +30,8 @@ namespace View {
             _mainImage.raycastTarget = b;
         }
 
-        public override void Initialize(FigData figData, Func<bool, bool> isColorMatch, Sprite sprite, float scaleFactor,
+        public override void Initialize(FigData figData, Func<bool, bool> isColorMatch, Sprite sprite,
+            float scaleFactor,
             Vector2Int coordinates) {
             _data = figData;
 
@@ -48,7 +47,7 @@ namespace View {
         }
 
         public void OnBeginDrag(PointerEventData eventData) {
-            if (!_colorMatch.Invoke(_data.IsBlack) && _isDragging) 
+            if (!_colorMatch.Invoke(_data.IsBlack) && _isDragging)
                 return;
 
             _isDragging = true;
@@ -68,15 +67,22 @@ namespace View {
             if (!_isDragging)
                 return;
 
-            MainImage.raycastTarget = true;
+            GameObject raycastedObject = eventData.pointerCurrentRaycast.gameObject;
+            if (!raycastedObject) {
+                ResetPosition();
+            }
+            else {
+                if (!eventData.pointerDrag.TryGetComponent(out BoardTile chessFig))
+                    ResetPosition();
+            }
+
 
             _isDragging = false;
+            MainImage.raycastTarget = true;
         }
 
         public override void ResetPosition() {
             _rectTransform.anchoredPosition = _originalPosition;
         }
-
-       
     }
 }
