@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Model.Data;
 using UnityEngine;
 
@@ -9,7 +10,15 @@ namespace Model {
         public Dictionary<Vector2Int, FigData> BoardState => _boardState;
 
         private bool _currentTurnBlack;
-        public bool CurrentTurnBlack => _currentTurnBlack;
+        public bool CurrentTurnBlack {
+            get { return _currentTurnBlack; }
+            set {
+                _currentTurnBlack = value;
+                OnTurnChange?.Invoke(_currentTurnBlack);
+            }
+        }
+
+        public event Action<bool> OnTurnChange;
 
         private static readonly FigType[] MainPieces = new[] {
             FigType.Rook, FigType.Knight, FigType.Bishop, FigType.Queen, FigType.King, FigType.Bishop,
@@ -17,7 +26,7 @@ namespace Model {
         };
 
         public void ResetBoard() {
-            _currentTurnBlack = false;
+            CurrentTurnBlack = false;
 
             if (_boardState.Count == 0) {
                 for (int len = 0; len < 64; len++) {
@@ -74,7 +83,7 @@ namespace Model {
             
             //invoke here putting figure to graveyard later
 
-            _currentTurnBlack = !_currentTurnBlack;
+            CurrentTurnBlack = !CurrentTurnBlack;
         }
 
         public FigData GetFigAt(Vector2Int position) {
@@ -84,5 +93,7 @@ namespace Model {
         private bool IsInBounds(Vector2Int position) {
             return position.x is >= 0 and < 8 && position.y is >= 0 and < 8;
         }
+
+        
     }
 }

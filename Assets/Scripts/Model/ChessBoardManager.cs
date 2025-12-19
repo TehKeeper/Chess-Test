@@ -5,17 +5,22 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using Utilities;
 using View;
+using View.UI;
 
 namespace Model {
     public class ChessBoardManager : MonoBehaviour, IDropHandler {
         [Header("UI References")]
         [SerializeField] private Canvas _canvas;
+        [SerializeField] private Transform _uiFigRoot;
 
         [Header("Prefabs")]
         [SerializeField] private ChessFigureBase _figPrefab;
 
         [Header("Sprites")]
         [SerializeField] private Pair<FigType, Sprite>[] _figSprites;
+        
+        [Header("UI")]
+        [SerializeField] private GameDisplay _display;
 
         private Dictionary<FigType, Sprite> _figuresSpriteDictionary = new();
 
@@ -26,6 +31,8 @@ namespace Model {
         [SerializeField] private BoardSpawnerBase _boardSpawner;
         private List<ChessFigureBase> _onBoardFigures = new();
 
+        private List<IDisposable> _disposers = new List<IDisposable>();
+
 
         private void Awake() {
             foreach (var item in _figSprites) {
@@ -33,6 +40,11 @@ namespace Model {
             }
 
             _boardSpawner.SpawnTiles(OnReleaseHandler);
+            
+            _display.SetupHandlers(delegate { ResetGame(); }, delegate {  }  , delegate {  } );
+
+            _boardData.OnTurnChange += _display.UpdateTurn;
+
         }
 
         private void OnReleaseHandler(Vector2Int coordinates, BoardTile tile, ChessFigureBase figure) {
@@ -66,14 +78,13 @@ namespace Model {
             _onBoardFigures.Clear();
 
             ChessFigureBase cachedFig = null;
-            Transform canvasTransform = _canvas.transform;
             foreach (var kvp in _boardData.BoardState) {
                 if (kvp.Value.Type == FigType.None)
                     continue;
 
                 
                 cachedFig = Instantiate(_figPrefab, _boardSpawner.Tiles[kvp.Key].GetWorldPosition(),
-                    Quaternion.identity,canvasTransform);
+                    Quaternion.identity,_uiFigRoot);
                 cachedFig.Initialize(kvp.Value, MatchColorToCurrentTurn, _figuresSpriteDictionary[kvp.Value.Type],
                     _canvas.scaleFactor, kvp.Key);
 
