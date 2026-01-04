@@ -24,24 +24,7 @@ namespace Model.Behaviour {
                 current.y += deltaY;
             }
 
-            if (CastlingConditions(startCoords, endCoords, boardState,
-                    out (Vector2Int coord, FigAbilityType ability) castlingTrigger)) {
-                abilityTrigger = castlingTrigger;
-                return true;
-            }
-
             return EndpointCheck(figureData, endCoords, boardState);
-        }
-
-        private bool CastlingConditions(Vector2Int startCoords, Vector2Int endCoords,
-            Dictionary<Vector2Int, FigData> boardState,
-            out (Vector2Int coord, FigAbilityType ability) castlingTrigger) {
-            
-            
-            //Castling requires to check if King and Rook moved, which cannot be checked simply by defining king and rook positions - they need to marked as moved somehow,
-            //Also King cannot move under Check - means, it cannot be threatened by opposing color pieces, so I'll leave this logic for later.
-            castlingTrigger = (new Vector2Int(-1, -1), FigAbilityType.None);
-            return false;
         }
     }
 }

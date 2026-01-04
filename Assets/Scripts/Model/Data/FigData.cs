@@ -21,5 +21,12 @@ namespace Model.Data {
             Coordinates = piece.Coordinates;
             PreviousCoordinates = previousCoordinates;
         }
+        
+        public FigData(FigData piece, FigType type) {
+            Type = type;
+            IsBlack = piece.IsBlack;
+            Coordinates = piece.Coordinates;
+            PreviousCoordinates = piece.PreviousCoordinates;
+        }
     }
 }

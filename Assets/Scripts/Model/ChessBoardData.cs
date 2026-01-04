@@ -30,10 +30,7 @@ namespace Model {
         private ChessMovementViabilityBase _movementLogic;
 
         public ChessBoardData() {
-            _movementLogic = new PawnMovementViability()
-                .ThenUse(new RookMovementViability())
-                .ThenUse(new KnightMovementViability())
-                .ThenUse(new BishopMovementViability());
+            _movementLogic = new ComplexMovementViability();
         }
 
         public void ResetBoard() {
