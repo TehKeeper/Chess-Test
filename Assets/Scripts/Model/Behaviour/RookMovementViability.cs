@@ -27,9 +27,10 @@ namespace Model.Behaviour {
             if (CastlingConditions(startCoords, endCoords, boardState,
                     out (Vector2Int coord, FigAbilityType ability) castlingTrigger)) {
                 abilityTrigger = castlingTrigger;
+                return true;
             }
 
-            return true;
+            return EndpointCheck(figureData, endCoords, boardState);
         }
 
         private bool CastlingConditions(Vector2Int startCoords, Vector2Int endCoords,

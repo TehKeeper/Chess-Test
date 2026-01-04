@@ -70,16 +70,11 @@ namespace Model {
             FigData piece = GetFigAt(startPoint);
             if (piece.Type == FigType.None) return false;
 
-            FigData target = GetFigAt(endPoint);
-            if (ColorCheck(target, piece)) return false;
+            //FigData target = GetFigAt(endPoint);
 
             return _movementLogic.IsViableMove(piece, startPoint, endPoint, _boardState, out abilityTrigger);
         }
 
-        private static bool ColorCheck(FigData target, FigData piece) {
-            //todo need either to move check from here to piece evaluation, or check here for castling
-            return target.Type != FigType.None && target.IsBlack == piece.IsBlack;
-        }
 
         public bool TryMovePiece(Vector2Int startPoint, Vector2Int endPoint) {
             FigData piece = GetFigAt(startPoint);

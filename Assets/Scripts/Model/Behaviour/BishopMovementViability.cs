@@ -32,7 +32,7 @@ namespace Model.Behaviour {
                 current += delta;
             }
 
-            return true;
+            return EndpointCheck(figureData, endCoords, boardState);;
         }
     }
 }

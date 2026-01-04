@@ -33,6 +33,10 @@ namespace Model.Behaviour {
 
         protected abstract bool MoveLogic(FigData figureData, Vector2Int startCoords, Vector2Int endCoords,
             Dictionary<Vector2Int, FigData> boardState, out (Vector2Int coord, FigAbilityType ability) abilityTrigger);
+
+        protected static bool EndpointCheck(FigData figureData, Vector2Int endCoords, Dictionary<Vector2Int, FigData> boardState) {
+            return boardState[endCoords].Type == FigType.None || figureData.IsBlack != boardState[endCoords].IsBlack;
+        }
     }
     
     public enum FigAbilityType{

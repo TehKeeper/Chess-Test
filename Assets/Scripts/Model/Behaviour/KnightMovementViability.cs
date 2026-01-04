@@ -26,7 +26,7 @@ namespace Model.Behaviour {
             
             for (int i = 0; i < PossibleSquares.Length; i++) {
                 if (startCoords + PossibleSquares[i] == endCoords) {
-                    return true;
+                    return EndpointCheck(figureData, endCoords, boardState);;
                 }
             }
 
