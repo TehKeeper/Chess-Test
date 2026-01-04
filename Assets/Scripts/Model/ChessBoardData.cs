@@ -82,9 +82,10 @@ namespace Model {
 
             _boardState[startPoint] = new FigData(FigType.None, false, startPoint);
             piece.Coordinates = endPoint;
-            AbilityActivation(abilityTrigger);
             
             _boardState[endPoint] = new FigData(piece, startPoint);
+            
+            AbilityActivation(abilityTrigger);
 
             //invoke here putting figure to graveyard later
 
