@@ -37,6 +37,7 @@ namespace Model.Behaviour {
     
     public enum FigAbilityType{
         None,
-        EnPassant
+        EnPassant,
+        Castling
     }
 }

@@ -31,12 +31,14 @@ namespace Model {
 
         public ChessBoardData() {
             _movementLogic = new PawnMovementViability()
-                .ThenUse(new RookMovementViability());
+                .ThenUse(new RookMovementViability())
+                .ThenUse(new KnightMovementViability())
+                .ThenUse(new BishopMovementViability());
         }
 
         public void ResetBoard() {
             CurrentTurnBlack = false;
-            
+
             for (int len = 0; len < 64; len++) {
                 _boardState[new Vector2Int(len % 8, len / 8)] = default;
             }
@@ -59,7 +61,8 @@ namespace Model {
             _boardState[position] = piece;
         }
 
-        public bool IsValidMove(Vector2Int startPoint, Vector2Int endPoint, out (Vector2Int coord, FigAbilityType ability) abilityTrigger) {
+        public bool IsValidMove(Vector2Int startPoint, Vector2Int endPoint,
+            out (Vector2Int coord, FigAbilityType ability) abilityTrigger) {
             abilityTrigger = (ChessMovementViabilityBase.NonExistCoord, FigAbilityType.None);
             if (!IsInBounds(startPoint) || !IsInBounds(endPoint)) return false;
             if (startPoint == endPoint) return false;
@@ -68,9 +71,14 @@ namespace Model {
             if (piece.Type == FigType.None) return false;
 
             FigData target = GetFigAt(endPoint);
-            if (target.Type != FigType.None && target.IsBlack == piece.IsBlack) return false;
+            if (ColorCheck(target, piece)) return false;
 
             return _movementLogic.IsViableMove(piece, startPoint, endPoint, _boardState, out abilityTrigger);
+        }
+
+        private static bool ColorCheck(FigData target, FigData piece) {
+            //todo need either to move check from here to piece evaluation, or check here for castling
+            return target.Type != FigType.None && target.IsBlack == piece.IsBlack;
         }
 
         public bool TryMovePiece(Vector2Int startPoint, Vector2Int endPoint) {
@@ -82,9 +90,9 @@ namespace Model {
 
             _boardState[startPoint] = new FigData(FigType.None, false, startPoint);
             piece.Coordinates = endPoint;
-            
+
             _boardState[endPoint] = new FigData(piece, startPoint);
-            
+
             AbilityActivation(abilityTrigger);
 
             //invoke here putting figure to graveyard later
