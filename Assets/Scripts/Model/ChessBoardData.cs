@@ -100,6 +100,15 @@ namespace Model {
                 case FigAbilityType.EnPassant:
                     _boardState[abilityTrigger.coord] = default;
                     break;
+                
+                case FigAbilityType.Castling:
+                    _boardState[abilityTrigger.coord] = new FigData(FigType.Rook, _currentTurnBlack, abilityTrigger.coord);
+                    if (abilityTrigger.coord.x == 5)
+                        _boardState[new Vector2Int(abilityTrigger.coord.x, 7)] = default;
+                    if (abilityTrigger.coord.x == 3)
+                        _boardState[new Vector2Int(abilityTrigger.coord.x, 0)] = default;
+                    
+                    break;
             }
         }
 
