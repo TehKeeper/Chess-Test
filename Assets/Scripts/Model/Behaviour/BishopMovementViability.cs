@@ -17,7 +17,7 @@ namespace Model.Behaviour {
             int diffX = endCoords.x - startCoords.x;
             int diffY = endCoords.y - startCoords.y;
 
-            if (diffX != diffY ^ diffX != -diffY)
+            if (diffX != diffY && diffX != -diffY)
                 return false;
 
 

@@ -17,7 +17,6 @@ namespace Model.Behaviour {
                 return MoveLogic(figureData, startCoords, endCoords, boardState, out abilityTrigger);
 
             if (_hasNextNode) {
-                Debug.Log($"Piece type: {figureData.Type} not matching {Type}, try next node: {_nextNode.Type}");
                 return _nextNode.IsViableMove(figureData, startCoords, endCoords, boardState, out abilityTrigger);
             }
 

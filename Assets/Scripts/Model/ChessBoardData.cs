@@ -104,9 +104,9 @@ namespace Model {
                 case FigAbilityType.Castling:
                     _boardState[abilityTrigger.coord] = new FigData(FigType.Rook, _currentTurnBlack, abilityTrigger.coord);
                     if (abilityTrigger.coord.x == 5)
-                        _boardState[new Vector2Int(abilityTrigger.coord.x, 7)] = default;
+                        _boardState[new Vector2Int(7, abilityTrigger.coord.y)] = default;
                     if (abilityTrigger.coord.x == 3)
-                        _boardState[new Vector2Int(abilityTrigger.coord.x, 0)] = default;
+                        _boardState[new Vector2Int(0,abilityTrigger.coord.y)] = default;
                     
                     break;
             }

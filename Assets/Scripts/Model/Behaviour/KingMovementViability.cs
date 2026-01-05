@@ -45,8 +45,11 @@ namespace Model.Behaviour {
             newRookPos = NonExistCoord;
             if (king.PreviousCoordinates != NonExistCoord)
                 return false;
-            
-            if (endCoords.y != king.Coordinates.y || endCoords.x != king.Coordinates.x + 2 || endCoords.x != king.Coordinates.x - 2)
+
+            bool b = endCoords.y != king.Coordinates.y;
+            bool b1 = endCoords.x != king.Coordinates.x + 2;
+            bool b2 = endCoords.x != king.Coordinates.x - 2;
+            if (b && (b1 || b2))
                 return false;
 
 
