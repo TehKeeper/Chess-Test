@@ -25,8 +25,10 @@ namespace Model.Behaviour {
             abilityTrigger = (NonExistCoord, FigAbilityType.None);
             
             for (int i = 0; i < PossibleSquares.Length; i++) {
+                Debug.Log($"End Coords: {endCoords}, possible coords: {startCoords + PossibleSquares[i]}, conition: {startCoords + PossibleSquares[i] == endCoords}" );
                 if (startCoords + PossibleSquares[i] == endCoords) {
-                    return EndpointCheck(figureData, endCoords, boardState);;
+                   
+                    return EndpointCheck(figureData, endCoords, boardState);
                 }
             }
 

@@ -13,15 +13,20 @@ namespace Model.Behaviour {
 
         public bool IsViableMove(FigData figureData, Vector2Int startCoords, Vector2Int endCoords,
             Dictionary<Vector2Int, FigData> boardState, out (Vector2Int coord, FigAbilityType ability) abilityTrigger) {
-            if (figureData.Type == Type)
+            if (TypeCheck(figureData))
                 return MoveLogic(figureData, startCoords, endCoords, boardState, out abilityTrigger);
 
             if (_hasNextNode) {
+                Debug.Log($"Piece type: {figureData.Type} not matching {Type}, try next node: {_nextNode.Type}");
                 return _nextNode.IsViableMove(figureData, startCoords, endCoords, boardState, out abilityTrigger);
             }
 
             abilityTrigger = (NonExistCoord, FigAbilityType.None);
             return false;
+        }
+
+        protected virtual bool TypeCheck(FigData figureData) {
+            return figureData.Type == Type;
         }
 
         public ChessMovementViabilityBase ThenUse(ChessMovementViabilityBase node) {

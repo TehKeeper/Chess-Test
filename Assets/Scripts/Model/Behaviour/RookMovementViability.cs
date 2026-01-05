@@ -8,6 +8,7 @@ namespace Model.Behaviour {
 
         protected override bool MoveLogic(FigData figureData, Vector2Int startCoords, Vector2Int endCoords,
             Dictionary<Vector2Int, FigData> boardState, out (Vector2Int coord, FigAbilityType ability) abilityTrigger) {
+            Debug.Log("Rook move");
             abilityTrigger = (NonExistCoord, FigAbilityType.None);
             if (startCoords.x != endCoords.x && startCoords.y != endCoords.y)
                 return false;
