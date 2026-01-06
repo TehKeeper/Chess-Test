@@ -28,5 +28,7 @@ namespace Model.Data {
             Coordinates = piece.Coordinates;
             PreviousCoordinates = piece.PreviousCoordinates;
         }
+
+        
     }
 }

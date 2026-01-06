@@ -73,8 +73,11 @@ namespace Model {
         }
 
 
-        public bool TryMovePiece(Vector2Int startPoint, Vector2Int endPoint) {
+        public bool TryMovePiece(Vector2Int startPoint, Vector2Int endPoint,
+            out List<(Vector2Int position, FigData data)> changedPieces) {
             FigData piece = GetFigAt(startPoint);
+            changedPieces = new List<(Vector2Int position, FigData data)>();
+
             if (piece.Type == FigType.None) return false;
 
             if (!IsValidMove(startPoint, endPoint, out (Vector2Int coord, FigAbilityType ability) abilityTrigger))
@@ -85,29 +88,49 @@ namespace Model {
 
             _boardState[endPoint] = new FigData(piece, startPoint);
 
-            AbilityActivation(abilityTrigger);
+            AbilityActivation(abilityTrigger, out List<(Vector2Int position, FigData data)> abilityChange);
 
             //invoke here putting figure to graveyard later
 
             CurrentTurnBlack = !CurrentTurnBlack;
+            changedPieces.Add((startPoint, _boardState[startPoint]));
+            changedPieces.Add((endPoint, _boardState[endPoint]));
+            if (!abilityChange.Equals(default)) {
+                changedPieces.AddRange(abilityChange);
+            }
+
             return true;
         }
 
-        private void AbilityActivation((Vector2Int coord, FigAbilityType ability) abilityTrigger) {
+        private void AbilityActivation((Vector2Int coord, FigAbilityType ability) abilityTrigger,
+            out List<(Vector2Int position, FigData data)> abilityChange) {
+            abilityChange = new List<(Vector2Int position, FigData data)>();
             switch (abilityTrigger.ability) {
                 case FigAbilityType.None:
                     return;
                 case FigAbilityType.EnPassant:
                     _boardState[abilityTrigger.coord] = default;
+                    abilityChange.Add((abilityTrigger.coord, new FigData(FigType.None, false, abilityTrigger.coord)));
                     break;
-                
+
                 case FigAbilityType.Castling:
                     _boardState[abilityTrigger.coord] = new FigData(FigType.Rook, _currentTurnBlack, abilityTrigger.coord);
-                    if (abilityTrigger.coord.x == 5)
-                        _boardState[new Vector2Int(7, abilityTrigger.coord.y)] = default;
-                    if (abilityTrigger.coord.x == 3)
-                        _boardState[new Vector2Int(0,abilityTrigger.coord.y)] = default;
+                    abilityChange.Add((abilityTrigger.coord, _boardState[abilityTrigger.coord]));
                     
+                    if (abilityTrigger.coord.x == 5) {
+                        Vector2Int vector2Int = new(7, abilityTrigger.coord.y);
+                        _boardState[vector2Int] = default;
+                        
+                        abilityChange.Add((abilityTrigger.coord, new FigData(FigType.None, false, abilityTrigger.coord)));
+                    }
+
+                    if (abilityTrigger.coord.x == 3) {
+                        Vector2Int vector2Int = new Vector2Int(0, abilityTrigger.coord.y);
+                        _boardState[vector2Int] = default;
+                        
+                        abilityChange.Add((abilityTrigger.coord, new FigData(FigType.None, false, abilityTrigger.coord)));
+                    }
+
                     break;
             }
         }

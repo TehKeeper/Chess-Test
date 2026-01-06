@@ -47,7 +47,7 @@ namespace Model {
             _display.SetupHandlers(ResetGame, delegate { _saveTool.SaveBoard(_boardData); }  ,
                 delegate {
                     _saveTool.LoadBoard(_boardData);
-                    UpdateBoard();
+                    ResetBoard();
                 } );
 
             _boardData.OnTurnChange += _display.UpdateTurn;
@@ -62,8 +62,9 @@ namespace Model {
             if (tile != null) {
                 Vector2Int from = figure.BoardCoordinates;
                 Vector2Int to = tile.BoardCoordinates;
-                if (_boardData.TryMovePiece(from, to)) {
-                    UpdateBoard();
+                if (_boardData.TryMovePiece(from, to, out List<(Vector2Int position, FigData data)> changedPieces)) {
+                    //UpdateBoard(changedPieces);
+                    ResetBoard();
                 }
                 else {
                     figure.ResetPosition();
@@ -71,13 +72,14 @@ namespace Model {
             }
         }
 
+        
+
         private void Start() {
             _boardData.SetupStandardGame();
-            UpdateBoard();
+            ResetBoard();
         }
 
-        private void UpdateBoard() {
-            //todo very crude update. need to eliminate "eaten" figure while not touching the others
+        private void ResetBoard() {
             foreach (var piece in _onBoardFigures) {
                 piece.Activate(false);
                 _pool.Enqueue(piece);
@@ -102,6 +104,22 @@ namespace Model {
                 boardFig.MakeActive(_boardData.CurrentTurnBlack == boardFig.FigColor);
             }
         }
+        
+        private void UpdateBoard(List<(Vector2Int position, FigData data)> changedPieces) {
+            ChessFigureBase cachedFig = null;
+            foreach (var kvp in changedPieces) {
+                if (kvp.data.Type == FigType.None) {
+                    //_pool.Enqueue(_onBoardFigures[]);
+                    
+                    
+                    continue;
+                }
+                
+                
+
+                _onBoardFigures.Add(cachedFig);
+            }
+        }
 
         private ChessFigureBase GetFigure(KeyValuePair<Vector2Int, FigData> kvp) {
             if (_pool.Count > 0) {
@@ -124,7 +142,7 @@ namespace Model {
         private void ResetGame() {
             _boardData.ResetBoard();
             _boardData.SetupStandardGame();
-            UpdateBoard();
+            ResetBoard();
         }
     }
 }
