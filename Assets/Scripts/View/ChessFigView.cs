@@ -28,7 +28,7 @@ namespace View {
             _object = gameObject;
         }
 
-        public override void MakeActive(bool b) {
+        public override void MakeInteractable(bool b) {
             _mainImage.raycastTarget = b;
         }
 
@@ -44,7 +44,7 @@ namespace View {
             SetCoordinates(coordinates);
         }
 
-        public void SetCoordinates(Vector2Int coordinates) {
+        private void SetCoordinates(Vector2Int coordinates) {
             BoardCoordinates = coordinates;
         }
 
@@ -84,11 +84,18 @@ namespace View {
         }
 
         public override void ResetPosition() {
+            Debug.Log("Reset Position");
             _rectTransform.anchoredPosition = _originalPosition;
         }
 
         public override void Activate(bool b) {
             _object.SetActive(b);
+        }
+
+        public override void SetWorldPosition(Vector3 worldPosition) {
+            Debug.Log($"Set world position: {worldPosition}");
+            _rectTransform.position = worldPosition;
+            _originalPosition = _rectTransform.anchoredPosition;
         }
     }
 }

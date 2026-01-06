@@ -29,6 +29,8 @@ namespace Model.Data {
             PreviousCoordinates = piece.PreviousCoordinates;
         }
 
-        
+        public override string ToString() {
+            return $"fig Type: {Type}, {(IsBlack?"Black":"White")}, coord: {Coordinates}";
+        }
     }
 }
