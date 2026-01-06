@@ -18,12 +18,14 @@ namespace View {
 
         private float _scaleFactor;
         private bool _isDragging;
+        private GameObject _object;
 
         public override bool FigColor => _data.IsBlack;
 
         private void Awake() {
             _rectTransform = GetComponent<RectTransform>();
             _mainImage = GetComponent<Image>();
+            _object = gameObject;
         }
 
         public override void MakeActive(bool b) {
@@ -83,6 +85,10 @@ namespace View {
 
         public override void ResetPosition() {
             _rectTransform.anchoredPosition = _originalPosition;
+        }
+
+        public override void Activate(bool b) {
+            _object.SetActive(b);
         }
     }
 }

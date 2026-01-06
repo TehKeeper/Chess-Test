@@ -12,5 +12,7 @@ namespace View {
         public abstract bool FigColor { get; }
         public Vector2Int BoardCoordinates { get; protected set; }
         public abstract void ResetPosition();
+
+        public abstract void Activate(bool b);
     }
 }

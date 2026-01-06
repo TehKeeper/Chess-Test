@@ -35,7 +35,8 @@ namespace Model {
 
         private SaveTool _saveTool = new SaveTool();
 
-
+        private Queue<ChessFigureBase> _pool = new ();
+        
         private void Awake() {
             foreach (var item in _figSprites) {
                 _figuresSpriteDictionary.Add(item.A, item.B);
@@ -78,7 +79,8 @@ namespace Model {
         private void UpdateBoard() {
             //todo very crude update. need to eliminate "eaten" figure while not touching the others
             foreach (var piece in _onBoardFigures) {
-                Destroy(piece.gameObject); //todo pool?
+                piece.Activate(false);
+                _pool.Enqueue(piece);
             }
 
             _onBoardFigures.Clear();
@@ -89,8 +91,7 @@ namespace Model {
                     continue;
 
                 
-                cachedFig = Instantiate(_figPrefab, _boardSpawner.Tiles[kvp.Key].GetWorldPosition(),
-                    Quaternion.identity,_uiFigRoot);
+                cachedFig = GetFigure(kvp);
                 cachedFig.Initialize(kvp.Value, MatchColorToCurrentTurn, _figuresSpriteDictionary[kvp.Value.Type],
                     _canvas.scaleFactor, kvp.Key);
 
@@ -100,6 +101,16 @@ namespace Model {
             foreach (ChessFigureBase boardFig in _onBoardFigures) {
                 boardFig.MakeActive(_boardData.CurrentTurnBlack == boardFig.FigColor);
             }
+        }
+
+        private ChessFigureBase GetFigure(KeyValuePair<Vector2Int, FigData> kvp) {
+            if (_pool.Count > 0) {
+                ChessFigureBase fig = _pool.Dequeue();
+                fig.Activate(true);
+            }
+            
+            return Instantiate(_figPrefab, _boardSpawner.Tiles[kvp.Key].GetWorldPosition(),
+                Quaternion.identity,_uiFigRoot);
         }
 
         private bool MatchColorToCurrentTurn(bool arg) => arg == _boardData.CurrentTurnBlack;
